@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>生产计划管理</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f8f9fa;
+            color: #343a40;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 20px auto;
+            background: #ffffff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        h1, h2 {
+            color: #007bff;
+            text-align: center;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+        table, th, td {
+            border: 1px solid #dee2e6;
+        }
+        th, td {
+            padding: 12px;
+            text-align: left;
+        }
+        th {
+            background-color: #e9ecef;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        .form-group input {
+            width: 100%;
+            padding: 10px;
+            margin-top: 5px;
+            border: 1px solid #ced4da;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        .btn {
+            padding: 10px 20px;
+            color: #ffffff;
+            background-color: #007bff;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            margin-right: 10px;
+        }
+        .btn:hover {
+            background-color: #0056b3;
+        }
+        .btn-danger {
+            background-color: #dc3545;
+        }
+        .btn-danger:hover {
+            background-color: #c82333;
+        }
+        .btn-warning {
+            background-color: #ffc107;
+        }
+        .btn-warning:hover {
+            background-color: #e0a800;
+        }
+
+        /* 模态框样式 */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0,0,0,0.4);
+        }
+        .modal-content {
+            background-color: #fefefe;
+            margin: 15% auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 80%;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+        }
+        .close:hover,
+        .close:focus {
+            color: black;
+            text-decoration: none;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>生产计划管理</h1>
+    <table id="plansTable">
+        <thead>
+        <tr>
+            <th>ID</th>
+            <th>土壤检测</th>
+            <th>种子选择</th>
+            <th>地块准备</th>
+            <th>播种时间</th>
+            <th>播种方法</th>
+            <th>基肥</th>
+            <th>追肥</th>
+            <th>灌溉计划</th>
+            <th>灌溉方式</th>
+            <th>监测</th>
+            <th>防治措施</th>
+            <th>收获时间</th>
+            <th>收获方法</th>
+            <th>田间清理</th>
+            <th>土壤改良</th>
+            <th>生产记录</th>
+            <th>效果评估</th>
+            <th>操作</th>
+        </tr>
+        </thead>
+        <tbody>
+        <!-- 数据将插入在这里 -->
+        </tbody>
+    </table>
+
+    <!-- 模态框 -->
+    <div id="editModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal()">&times;</span>
+            <h2>编辑计划</h2>
+            <input type="hidden" id="planId">
+            <div class="form-group">
+                <label for="soilTesting">土壤检测:</label>
+                <input type="text" id="soilTesting">
+            </div>
+            <div class="form-group">
+                <label for="seedSelection">种子选择:</label>
+                <input type="text" id="seedSelection">
+            </div>
+            <div class="form-group">
+                <label for="fieldPreparation">地块准备:</label>
+                <input type="text" id="fieldPreparation">
+            </div>
+            <div class="form-group">
+                <label for="sowingTime">播种时间:</label>
+                <input type="date" id="sowingTime">
+            </div>
+            <div class="form-group">
+                <label for="sowingMethod">播种方法:</label>
+                <input type="text" id="sowingMethod">
+            </div>
+            <div class="form-group">
+                <label for="baseFertilizer">基肥:</label>
+                <input type="text" id="baseFertilizer">
+            </div>
+            <div class="form-group">
+                <label for="topDressing">追肥:</label>
+                <input type="text" id="topDressing">
+            </div>
+            <div class="form-group">
+                <label for="irrigationPlan">灌溉计划:</label>
+                <input type="text" id="irrigationPlan">
+            </div>
+            <div class="form-group">
+                <label for="irrigationMethod">灌溉方式:</label>
+                <input type="text" id="irrigationMethod">
+            </div>
+            <div class="form-group">
+                <label for="monitoring">监测:</label>
+                <input type="text" id="monitoring">
+            </div>
+            <div class="form-group">
+                <label for="controlMeasures">防治措施:</label>
+                <input type="text" id="controlMeasures">
+            </div>
+            <div class="form-group">
+                <label for="harvestTime">收获时间:</label>
+                <input type="date" id="harvestTime">
+            </div>
+            <div class="form-group">
+                <label for="harvestMethod">收获方法:</label>
+                <input type="text" id="harvestMethod">
+            </div>
+            <div class="form-group">
+                <label for="fieldCleaning">田间清理:</label>
+                <input type="text" id="fieldCleaning">
+            </div>
+            <div class="form-group">
+                <label for="soilImprovement">土壤改良:</label>
+                <input type="text" id="soilImprovement">
+            </div>
+            <div class="form-group">
+                <label for="productionRecords">生产记录:</label>
+                <input type="text" id="productionRecords">
+            </div>
+            <div class="form-group">
+                <label for="effectivenessEvaluation">效果评估:</label>
+                <input type="text" id="effectivenessEvaluation">
+            </div>
+            <div class="form-group">
+                <button class="btn btn-warning" onclick="savePlan()">保存</button>
+            </div>
+        </div>
+    </div>
+
+    <button class="btn" onclick="openModal()">添加新计划</button>
+</div>
+
+<script>
+    const apiUrl = "http://127.0.0.1:8080/api";
+
+    document.addEventListener('DOMContentLoaded', function() {
+        fetchPlans();
+    });
+
+function fetchPlans() {
+    fetch(`${apiUrl}/plans`)
+        .then(response => response.json())
+        .then(data => {
+            const tableBody = document.querySelector('#plansTable tbody');
+            tableBody.innerHTML = '';
+            data.forEach(plan => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${plan.id}</td>
+                    <td>${plan.soilTesting}</td>
+                    <td>${plan.seedSelection}</td>
+                    <td>${plan.fieldPreparation}</td>
+                    <td>${plan.sowingTime}</td>
+                    <td>${plan.sowingMethod}</td>
+                    <td>${plan.baseFertilizer}</td>
+                    <td>${plan.topDressing}</td>
+                    <td>${plan.irrigationPlan}</td>
+                    <td>${plan.irrigationMethod}</td>
+                    <td>${plan.monitoring}</td>
+                    <td>${plan.controlMeasures}</td>
+                    <td>${plan.harvestTime}</td>
+                    <td>${plan.harvestMethod}</td>
+                    <td>${plan.fieldCleaning}</td>
+                    <td>${plan.soilImprovement}</td>
+                    <td>${plan.productionRecords}</td>
+                    <td>${plan.effectivenessEvaluation}</td>
+                    <td>
+                        <button class="btn btn-warning" onclick="editPlan(${plan.id})">编辑</button>
+                        <button class="btn btn-danger" onclick="deletePlan(${plan.id})">删除</button>
+                    </td>
+                `;
+                tableBody.appendChild(row);
+            });
+        })
+        .catch(error => console.error('获取计划出错:', error));
+}
+
+    function openModal() {
+    // 清空模态框中的旧数据
+    document.getElementById('planId').value = '';
+    document.getElementById('soilTesting').value = '';
+    document.getElementById('seedSelection').value = '';
+    document.getElementById('fieldPreparation').value = '';
+    document.getElementById('sowingTime').value = '';
+    document.getElementById('sowingMethod').value = '';
+    document.getElementById('baseFertilizer').value = '';
+    document.getElementById('topDressing').value = '';
+    document.getElementById('irrigationPlan').value = '';
+    document.getElementById('irrigationMethod').value = '';
+    document.getElementById('monitoring').value = '';
+    document.getElementById('controlMeasures').value = '';
+    document.getElementById('harvestTime').value = '';
+    document.getElementById('harvestMethod').value = '';
+    document.getElementById('fieldCleaning').value = '';
+    document.getElementById('soilImprovement').value = '';
+    document.getElementById('productionRecords').value = '';
+    document.getElementById('effectivenessEvaluation').value = '';
+
+    // 打开模态框
+    const modal = document.getElementById('editModal');
+    modal.style.display = 'block';
+}
+
+function closeModal() {
+    // 关闭模态框
+    const modal = document.getElementById('editModal');
+    modal.style.display = 'none';
+}
+
+function editPlan(id) {
+    fetch(`${apiUrl}/plan/${id}`)
+        .then(response => response.json())
+        .then(plan => {
+            // 填充模态框中的表单字段
+            document.getElementById('planId').value = plan.id;
+            document.getElementById('soilTesting').value = plan.soilTesting;
+            document.getElementById('seedSelection').value = plan.seedSelection;
+            document.getElementById('fieldPreparation').value = plan.fieldPreparation;
+            document.getElementById('sowingTime').value = plan.sowingTime;
+            document.getElementById('sowingMethod').value = plan.sowingMethod;
+            document.getElementById('baseFertilizer').value = plan.baseFertilizer;
+            document.getElementById('topDressing').value = plan.topDressing;
+            document.getElementById('irrigationPlan').value = plan.irrigationPlan;
+            document.getElementById('irrigationMethod').value = plan.irrigationMethod;
+            document.getElementById('monitoring').value = plan.monitoring;
+            document.getElementById('controlMeasures').value = plan.controlMeasures;
+            document.getElementById('harvestTime').value = plan.harvestTime;
+            document.getElementById('harvestMethod').value = plan.harvestMethod;
+            document.getElementById('fieldCleaning').value = plan.fieldCleaning;
+            document.getElementById('soilImprovement').value = plan.soilImprovement;
+            document.getElementById('productionRecords').value = plan.productionRecords;
+            document.getElementById('effectivenessEvaluation').value = plan.effectivenessEvaluation;
+
+            // 打开编辑模态框
+            openModal();
+        })
+        .catch(error => console.error('获取计划详情出错:', error));
+}
+
+function savePlan() {
+    const planId = document.getElementById('planId').value;
+    const plan = {
+        soilTesting: document.getElementById('soilTesting').value,
+        seedSelection: document.getElementById('seedSelection').value,
+        fieldPreparation: document.getElementById('fieldPreparation').value,
+        sowingTime: document.getElementById('sowingTime').value,
+        sowingMethod: document.getElementById('sowingMethod').value,
+        baseFertilizer: document.getElementById('baseFertilizer').value,
+        topDressing: document.getElementById('topDressing').value,
+        irrigationPlan: document.getElementById('irrigationPlan').value,
+        irrigationMethod: document.getElementById('irrigationMethod').value,
+        monitoring: document.getElementById('monitoring').value,
+        controlMeasures: document.getElementById('controlMeasures').value,
+        harvestTime: document.getElementById('harvestTime').value,
+        harvestMethod: document.getElementById('harvestMethod').value,
+        fieldCleaning: document.getElementById('fieldCleaning').value,
+        soilImprovement: document.getElementById('soilImprovement').value,
+        productionRecords: document.getElementById('productionRecords').value,
+        effectivenessEvaluation: document.getElementById('effectivenessEvaluation').value
+    };
+
+    let apiUrl = `${apiUrl}/update/${planId}`;
+    if (!planId) {
+        apiUrl = `${apiUrl}/add`;
+    }
+
+    fetch(apiUrl, {
+        method: planId ? 'PUT' : 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(plan)
+    })
+    .then(response => {
+        if (response.ok) {
+            fetchPlans();
+            closeModal();
+            alert('计划保存成功');
+        } else {
+            alert('保存计划失败');
+        }
+    })
+    .catch(error => console.error('保存计划出错:', error));
+}
+
+function deletePlan(id) {
+    fetch(`${apiUrl}/delete/${id}`, {
+        method: 'DELETE'
+    })
+    .then(response => {
+        if (response.ok) {
+            fetchPlans();
+            alert('计划删除成功');
+        } else {
+            alert('删除计划失败');
+        }
+    })
+    .catch(error => console.error('删除计划出错:', error));
+}
+</script>
+</body>
+</html>
