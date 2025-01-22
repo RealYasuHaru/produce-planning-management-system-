@@ -1,4 +1,3 @@
-以下是按照要求将中英文分开的 README.md 文件内容：
 生产计划管理系统
 Production Plan Management System
 项目简介
